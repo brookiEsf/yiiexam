@@ -44,4 +44,8 @@ class Categories extends \yii\db\ActiveRecord
             'cat_definition' => 'Cat Definition',
         ];
     }
+
+//    public function getCatProd(){
+//        return $this->hasMany(Catprod::className(), ['cat_id' => 'id']);
+//    }
 }

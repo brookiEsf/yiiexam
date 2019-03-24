@@ -3,9 +3,9 @@
 use yii\db\Migration;
 
 /**
- * Class m190315_173254_catprod
+ * Class m190213_184127_users
  */
-class m190315_173254_catprod extends Migration
+class m190213_184127_users extends Migration
 {
     /**
      * {@inheritdoc}
@@ -16,15 +16,19 @@ class m190315_173254_catprod extends Migration
         if ($this->db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=INNODB';
         }
-        $this->createTable('{{%catprod}}', [
+        $this->createTable('{{%users}}', [
             'id' => $this->primaryKey(),
-            'cat_id' => $this->integer(95)->notNull(),
-            'prod_id' => $this->integer(95)->notNull(),
+            'username' => $this->string(32)->unique()->notNull(),
+            'password' => $this->string(95)->notNull(),
+            'email' => $this->string(255)->notNull()->unique(),
+            'status' => $this->smallInteger()->notNull()->defaultValue(1),
             'created_at' => $this->timestamp(),
+            'updated_at' => $this->timestamp(),
+            'auth_key' => $this->string(32)->notNull(),
+            'password_reset_token' => $this->string(32)->unique()
+            //status: 1-зареєстр, 10-підтверджений, 11-редактор, 100-адмін
 
         ], $tableOptions);
-
-
     }
 
     /**
@@ -33,7 +37,7 @@ class m190315_173254_catprod extends Migration
     public function safeDown()
     {
         // echo "m190213_184127_users cannot be reverted.\n";
-        $this->dropTable('{{%catprod}}');
+        $this->dropTable('{{%users}}');
         return false;
     }
 
@@ -46,7 +50,7 @@ class m190315_173254_catprod extends Migration
 
     public function down()
     {
-        echo "m190315_173254_catprod cannot be reverted.\n";
+        echo "m190213_184127_users cannot be reverted.\n";
 
         return false;
     }

@@ -8,6 +8,11 @@ use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
+use app\modules\admin\Admin;
+use app\models\User;
+use app\models\Categories;
+use app\controllers\CategoriesController;
 
 /**
  * ProductsController implements the CRUD actions for Products model.
@@ -26,8 +31,39 @@ class ProductsController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
+            'access' => [
+                'class' => AccessControl::className(),
+
+                'rules' =>
+                    [
+                        [
+                            'actions' => ['index','view'],
+                            'allow' => true,
+                            'roles' => ['?']
+                        ],
+
+                        [
+                            'actions' => ['index','view'],
+                            'allow' => true,
+                            'roles' => ['@']
+                        ],
+
+                        [
+                            'actions' => ['create','update','delete'],
+                            'allow' => true,
+                            'roles' => ['@'],
+                            'matchCallback' => function ($rule, $action)
+                            {
+                                return User::isUserAdmin(Yii::$app->user->identity->username);
+                            }
+                        ],
+                    ],
+
+            ],
         ];
     }
+
+
 
     /**
      * Lists all Products models.
@@ -55,6 +91,9 @@ class ProductsController extends Controller
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
+
+//        $products = Products::findOne(1);
+//        $categories = $products->categories;
     }
 
     /**
@@ -72,6 +111,7 @@ class ProductsController extends Controller
 
         return $this->render('create', [
             'model' => $model,
+           // 'model_cat' => Categories::find()->all(),
         ]);
     }
 
@@ -124,4 +164,31 @@ class ProductsController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
+public function filters()
+{
+    return array(
+        'accessControl',
+    );
+}
+
+//    public function accessRules()
+//    {
+//        return array(
+//            array('deny',
+//                'actions'=>array('delete', 'create', 'update'),
+//                'users'=>array('?'),
+//            ),
+//            array('allow',
+//                'actions'=>array('delete', 'create', 'update'),
+//                'roles'=>array('admin'),
+//            ),
+//            array('deny',
+//                'actions'=>array('view'),
+//                'users'=>array('*'),
+//            ),
+//        );
+//    }
+//
+//
 }

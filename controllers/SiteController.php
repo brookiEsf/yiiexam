@@ -2,13 +2,18 @@
 
 namespace app\controllers;
 
+
 use Yii;
+//use yii\debug\models\search\User;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\User;
+use app\models\SignUp;
+use yii\db\ActiveRecord;
 
 class SiteController extends Controller
 {
@@ -20,13 +25,26 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout'],
+                'only' => ['login', 'logout', 'about', 'view', 'contact'],
                 'rules' => [
                     [
                         'actions' => ['logout'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
+                    [
+                        'allow' => true,
+                        'actions' => ['login', 'signup'],
+                        'roles' => ['?'],
+                    ],
+//                     [
+//                   'actions' => ['delete', 'create', 'update'],
+//                   'allow' => true,
+//                   'roles' => ['@'],
+//                   'matchCallback' => function ($rule, $action) {
+//                       return User::isUserAdmin(Yii::$app->user->identity->username);
+//                   }
+//               ],
                 ],
             ],
             'verbs' => [
@@ -86,6 +104,22 @@ class SiteController extends Controller
         ]);
     }
 
+//    public function actionLogin()
+//    {
+//        if (!\Yii::$app->user->isGuest) {
+//            return $this->goHome();
+//        }
+//
+//        $model = new LoginForm();
+//        if ($model->load(Yii::$app->request->post()) && $model->loginAdmin()) {
+//            return $this->goBack();
+//        } else {
+//            return $this->render('login', [
+//                'model' => $model,
+//            ]);
+//        }
+//    }
+
     /**
      * Logout action.
      *
@@ -114,6 +148,18 @@ class SiteController extends Controller
         return $this->render('contact', [
             'model' => $model,
         ]);
+    }
+
+    public function actionSignUp()
+    {
+        $data = new SignUp();
+        if ($data->load(Yii::$app->request->post()) && $data->SignUp()) {
+            Yii::$app->session->setFlash('success', 'ty 4 registration');
+        }
+        $data->password = '';
+        $data->confirmPassword = '';
+
+        return $this->render('signup', ['model' => $data]);
     }
 
     /**

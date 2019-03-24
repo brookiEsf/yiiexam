@@ -8,6 +8,10 @@ use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
+use app\modules\admin\Admin;
+use app\models\User;
+
 
 /**
  * CategoriesController implements the CRUD actions for Categories model.
@@ -26,8 +30,38 @@ class CategoriesController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
+            'access' => [
+                'class' => AccessControl::className(),
+
+                'rules' =>
+                    [
+                        [
+                            'actions' => ['index','view'],
+                            'allow' => true,
+                            'roles' => ['?']
+                        ],
+
+                        [
+                            'actions' => ['index','view'],
+                            'allow' => true,
+                            'roles' => ['@']
+                        ],
+
+                        [
+                            'actions' => ['create','update','delete'],
+                            'allow' => true,
+                            'roles' => ['@'],
+                            'matchCallback' => function ($rule, $action)
+                            {
+                                return User::isUserAdmin(Yii::$app->user->identity->username);
+                            }
+                        ],
+                    ],
+
+            ],
         ];
     }
+
 
     /**
      * Lists all Categories models.
